@@ -1,5 +1,3 @@
-import math;
-
 def find_maximum(jolts, search_size, max_jolt):
     # if the search size is 0 we are done
     if search_size == 0:
@@ -49,8 +47,6 @@ def main():
         print(jolt);
 
         res += int(jolt);
-
-        # find the maximum value that is not the last number in the array
 
     print(res);
 
