@@ -1,46 +1,61 @@
+import re
+import math
+
 def main():
     with open('input.txt', 'r', encoding='utf-8') as file:
         input = file.read()
 
-    fresh = 0;
-
     # with open('input_test.txt', 'r', encoding='utf-8') as file:
     #     input = file.read()
 
-    data = input.split("\n\n");
-    ranges = data[0].split("\n");
+    list = input.split("\n");
 
-    # create tuples for ranges
-    ranges = [tuple(map(int, range.split("-"))) for range in ranges];   
+    # initialise 2D array the size of the list
+    script = [[0 for _ in range(len(list))] for _ in range(len(list))];
+
+    for i in range(len(list)):
+        script_line = re.split(r'\s+', list[i].strip());
+        script[i] = script_line;
     
-    # sort the ranges
-    ranges.sort(key=lambda x: x[0]);
+    columns = [[0 for _ in range(len(list))] for _ in range(len(script[0]))];
+    
+    # create columns
+    for i in range(len(script[0])):
+        columns[i] = [script[j][i] for j in range(len(script))];
+    
+    res = 0;
 
-    # split the ranges into two arrays, one for the lower bounds and one for the upper bounds
-    lower_bounds = [range[0] for range in ranges];
-    upper_bounds = [range[1] for range in ranges];
+    operation_index = len(list) - 1;
 
-    print(lower_bounds, upper_bounds);
+    # loop through all columns
+    for i in range(len(columns)):
+        # find the longest string size in the column
+        longest = len(max(columns[i], key=len));
 
-    max_upper = 0;
+        # create an empty list with size of longest string to create ints
+        new_numbers = ['' for _ in range(longest)];
 
-    # iterate through array and find the 
-    for i in range(len(lower_bounds)):
-        ingredients = 0;
+        # loop through the rows of each script and detach length of longest + 1 (to account for space)
+        for j in range(len(list) - 1):
+            number = str(list[j][:longest + 1]);
+            list[j] = list[j][longest + 1:];
 
-        if (i == 0):
-            ingredients = upper_bounds[i] - lower_bounds[i] + 1;
-            max_upper = upper_bounds[i];
-        # if seen entirely new range, add the number of ingredients to the fresh count
-        elif lower_bounds[i] > max_upper:
-            ingredients =  upper_bounds[i] - lower_bounds[i] + 1;
-            max_upper = upper_bounds[i];
-        elif upper_bounds[i] > max_upper:
-            ingredients =  upper_bounds[i] - max_upper;
-            max_upper = upper_bounds[i];
+            # distribute the numbers into the new list
+            for k in range(0, len(number)):
+                if (number[k] == ' '):
+                    continue;
+                new_numbers[k] = str(new_numbers[k]) + str(number[k]);
+                
 
-        fresh += ingredients;
 
-    print(fresh);
+        # convert new numbers to ints
+        new_numbers = [int(x) for x in new_numbers];
+
+        if columns[i][operation_index] == "*":
+            res += math.prod(new_numbers);
+        elif columns[i][operation_index] == "+":
+            res += sum(new_numbers);
+        
+    print(res);
 
 main();
